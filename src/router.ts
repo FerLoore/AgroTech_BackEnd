@@ -1,7 +1,14 @@
 import { Router } from "express";
-import { prueba } from "./handlers";
+import agroRolRoutes from "./routes/agroRol.routes";
+
+// Cada dev agrega su línea aquí al terminar su módulo
+// Dev 1 → agroRol, agroTipoArbol, agroCatalogoPatogeno, agroProducto
+// Dev 2 → agroUsuario, agroFinca, agroSeccion, agroClima
+// Dev 3 → agroSurco, agroArbol, agroHistorial
+// Dev 4 → agroAlertaSalud, agroAnalisisLaboratorio, agroTratamientos
+
 const router = Router();
 
-router.get('/', prueba);
+router.use("/agro-roles", agroRolRoutes);
 
 export default router;
