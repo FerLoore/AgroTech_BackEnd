@@ -1,11 +1,22 @@
-//index.ts es el punto de entrada de la aplicación, aquí se configura el servidor y se inicia la aplicación
-import server from './server' // Agrega el .ts solo para probar si el IDE lo reconoce
-import colors from 'colors'
+import "reflect-metadata";
+import { AppDataSource } from "./config/data-source";
+import app from "./server";
+import dotenv from "dotenv";
+import colors from "colors";
 
-///////////////////////////////////////////////////////////////////////
-const port = process.env.PORT || 9090
+dotenv.config();
 
-//Routing
-server.listen(port, () => {
-    console.log(colors.bgCyan.blue.bold(`Server is running on port: ${port}`))
-})
+// Primero conecta Oracle, luego levanta Express
+AppDataSource.initialize()
+    .then(() => {
+        console.log(colors.green.bold("✅ Conectado a Oracle 21c"));
+
+        const port = process.env.PORT || 3000;
+        app.listen(port, () => {
+            console.log(colors.cyan.bold(`🚀 Servidor corriendo en http://localhost:${port}`));
+        });
+    })
+    .catch((error) => {
+        console.error(colors.red.bold("❌ Error conectando a Oracle:"), error);
+        process.exit(1);
+    });
