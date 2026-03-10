@@ -2,6 +2,7 @@ import { Router } from "express";
 import agroRolRoutes from "./routes/agroRol.routes";
 import agroSurcoRoutes from "./routes/agroSurco.routes";
 import agroArbolRoutes from "./routes/agroArbol.routes";
+import agroHistorialRoutes from "./routes/agroHistorial.routes";
 
 // Cada dev agrega su línea aquí al terminar su módulo
 // Dev 1 → agroRol, agroTipoArbol, agroCatalogoPatogeno, agroProducto
@@ -15,4 +16,5 @@ const router = Router();
 router.use("/agro-roles", agroRolRoutes);
 router.use("/agro-surcos", agroSurcoRoutes);
 router.use("/agro-arboles", agroArbolRoutes);
+router.use("/agro-historial", agroHistorialRoutes);
 export default router;
