@@ -2,10 +2,15 @@
 // se conecta a la base de datos y se define el middleware para leer los datos del formulario
 import express from 'express'
 import router from './router'//conectar a la base de datos
+import cors from "cors";
 
 const app = express()
 
 //Cors
+app.use(cors({
+    origin: process.env.FRONTEND_SERVICE  // puerto de Vite
+}));
+
 
 //leer datos de forumalario
 app.use(express.json())
