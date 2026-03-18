@@ -18,6 +18,6 @@ export class AgroClima {
     @Column({ name: "CLIM_PRECIPITACION", type: "number", precision: 8, scale: 2, nullable: true})
     clim_precipitacion: number;
     
-    @Column({ name: "SEC_SECCION", type: "number",})
+    @Column({ name: "SECC_SECCION", type: "number",})
     secc_seccion: number;
 }

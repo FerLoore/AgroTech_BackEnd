@@ -5,7 +5,7 @@ import {
     createAgroClima,
     updateAgroClima,
     deleteAgroClima
-} from "../handlers/agroClima.handler"; // <-- Verifica que esta ruta coincida con tu carpeta de controladores
+} from "../handlers/agroClima.handler";
 
 const router = Router();
 
