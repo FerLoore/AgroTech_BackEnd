@@ -24,7 +24,7 @@ router.use("/agro-catalogo-patogeno", agroCatalogoPatogenoRoutes);
 router.use("/agro-producto", agroProductoRoutes);
 
 
-router.use("/agro-roles", agroRolRoutes);
+// Dev 3 → agroSurco, agroArbol, agroHistorial
 router.use("/agro-surcos", agroSurcoRoutes);
 router.use("/agro-arboles", agroArbolRoutes);
 router.use("/agro-historial", agroHistorialRoutes);

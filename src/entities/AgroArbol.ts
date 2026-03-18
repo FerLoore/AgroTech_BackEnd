@@ -1,9 +1,9 @@
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("AGRO_ARBOL")
 export class AgroArbol {
 
-    @PrimaryColumn({ name: "ARB_ARBOL", type: "number" })
+    @PrimaryGeneratedColumn({ name: "ARB_ARBOL", type: "number" })
     arb_arbol: number;
 
     @Column({ name: "ARB_POSICION_SURCO", type: "number" })
