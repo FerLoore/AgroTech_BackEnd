@@ -12,7 +12,7 @@ export class AgroUsuario {
     @Column({ name: "ROL_ROL", type: "number"  })
     rol_rol: number;
 
-    @Column({ name: "USU_ESPECIALIDAD", type: "varchar2", length: 150 })
+    @Column({ name: "USU_ESPECIALIDAD", type: "varchar2", length: 150, nullable: true })
     usu_especialidad: string;
 
     @Column({ name: "USU_ACTIVO", type: "number", default: 1 })
