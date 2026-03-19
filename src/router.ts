@@ -9,7 +9,7 @@ import agroProductoRoutes from "./routes/agroProducto.routes";
 import agroAlertaSaludRoutes from "./routes/agroAlertaSalud.routes";
 import agroAnalisisLaboratorioRoutes from "./routes/agroAnalisisLaboratorio.routes";
 import agroTratamientosRoutes from "./routes/agroTratamientos.routes";
-import agroClimaRoutes  from "./routes/agroCLima.routes";
+import agroClimaRoutes  from "./routes/agroClima.routes";
 import agroFincaRoutes from "./routes/agroFinca.routes";
 import agroUsuarioRoutes from "./routes/agroUsuario.routes";
 import agroSeccionRoutes from "./routes/agroSeccion.routes";
