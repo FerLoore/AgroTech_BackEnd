@@ -12,7 +12,7 @@ export class AgroClima {
     @Column({ name: "CLIM_TEMPERATURA", type: "number", precision: 5, scale: 2, nullable: true })
     clim_temperatura: number;
 
-   @Column({ name: "CLIM_HUMEDAD_RELATIVA", type: "number", precision: 5, scale: 2, nullable: true})
+    @Column({ name: "CLIM_HUMEDAD_RELATIVA", type: "number", precision: 5, scale: 2, nullable: true})
     clim_humedad_relativa: number;
 
     @Column({ name: "CLIM_PRECIPITACION", type: "number", precision: 8, scale: 2, nullable: true})

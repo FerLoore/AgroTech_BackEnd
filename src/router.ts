@@ -9,7 +9,7 @@ import agroProductoRoutes from "./routes/agroProducto.routes";
 import agroAlertaSaludRoutes from "./routes/agroAlertaSalud.routes";
 import agroAnalisisLaboratorioRoutes from "./routes/agroAnalisisLaboratorio.routes";
 import agroTratamientosRoutes from "./routes/agroTratamientos.routes";
-import agroClimaRoutes  from "./routes/agroCLima.routes";
+import agroClimaRoutes  from "./routes/agroClima.routes";
 import agroFincaRoutes from "./routes/agroFinca.routes";
 import agroUsuarioRoutes from "./routes/agroUsuario.routes";
 import agroSeccionRoutes from "./routes/agroSeccion.routes";
@@ -35,7 +35,7 @@ router.use("/agro-usuario", agroUsuarioRoutes);
 router.use("/agro-finca", agroFincaRoutes);
 router.use("/agro-seccion", agroSeccionRoutes);
 router.use("/agro-clima", agroClimaRoutes);
- 
+
 // Dev 4 -> agroAlertaSalud, agroAnalisisLaboratorio, agroTratamientos
 router.use("/agro-alerta-salud", agroAlertaSaludRoutes);
 router.use("/agro-analisis-laboratorio", agroAnalisisLaboratorioRoutes);
