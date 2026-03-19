@@ -35,7 +35,7 @@ router.use("/agro-usuario", agroUsuarioRoutes);
 router.use("/agro-finca", agroFincaRoutes);
 router.use("/agro-seccion", agroSeccionRoutes);
 router.use("/agro-clima", agroClimaRoutes);
- 
+
 // Dev 4 -> agroAlertaSalud, agroAnalisisLaboratorio, agroTratamientos
 router.use("/agro-alerta-salud", agroAlertaSaludRoutes);
 router.use("/agro-analisis-laboratorio", agroAnalisisLaboratorioRoutes);
