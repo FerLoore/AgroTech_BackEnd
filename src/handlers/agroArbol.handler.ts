@@ -1,16 +1,13 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { AgroArbol } from "../entities/AgroArbol";
-import { AgroHistorial } from "../entities/AgroHistorial";
+
 
 const agroArbolRepo = AppDataSource.getRepository(AgroArbol);
-const historialRepo = AppDataSource.getRepository(AgroHistorial);
 
-//  función reutilizable
-const guardarHistorial = async (data: any) => {
-    const historial = historialRepo.create(data);
-    await historialRepo.save(historial);
-};
+
+
+
 
 // ─────────────────────────────────────────
 // GET - listar árboles
@@ -113,14 +110,7 @@ export const createAgroArbol = async (req: Request, res: Response) => {
 
         await agroArbolRepo.save(nuevoArbol);
 
-        //  GUARDAR HISTORIAL
-        await guardarHistorial({
-            histo_estado_anterior: null,
-            histo_estado_nuevo: estadoInicial,
-            arb_arbol: nuevoArbol.arb_arbol,
-            histo_motivo: "Creación del árbol",
-            usu_usuario: 1
-        });
+       
 
         res.status(201).json({
             ok: true,
@@ -186,13 +176,6 @@ export const updateAgroArbol = async (req: Request, res: Response) => {
         const estadoNuevo = arb_estado || arbol.arb_estado;
         if (estadoNuevo && estadoNuevo !== arbol.arb_estado) {
 
-            await guardarHistorial({
-                histo_estado_anterior: arbol.arb_estado,
-                histo_estado_nuevo: estadoNuevo,
-                arb_arbol: arbol.arb_arbol,
-                histo_motivo: "Cambio de estado",
-                usu_usuario: 1
-            });
 
             arbol.arb_estado = estadoNuevo;
         }
@@ -239,14 +222,7 @@ export const deleteAgroArbol = async (req: Request, res: Response) => {
         arbol.arb_activo = 0;
         await agroArbolRepo.save(arbol);
 
-        // estado válido (IMPORTANTE)
-        await guardarHistorial({
-            histo_estado_anterior: arbol.arb_estado,
-            histo_estado_nuevo: "Muerto",
-            arb_arbol: arbol.arb_arbol,
-            histo_motivo: "Eliminación lógica",
-            usu_usuario: 1
-        });
+       
 
         res.json({
             ok: true,
