@@ -98,18 +98,22 @@ export const createAgroArbol = async (req: Request, res: Response) => {
             });
         }
 
+        //  DEFINIR ESTADO INICIAL
+        const estadoInicial = arb_estado || "Crecimiento";
+
+        //  CREAR ÁRBOL CON ESTADO (ANTES NO LO TENÍAS)
         const nuevoArbol = agroArbolRepo.create({
             arb_posicion_surco: Number(arb_posicion_surco),
             arb_fecha_siembra,
             tipar_tipo_arbol: Number(tipar_tipo_arbol),
             sur_surcos: Number(sur_surcos),
+            arb_estado: estadoInicial, //  
             arb_activo: 1
         });
 
         await agroArbolRepo.save(nuevoArbol);
 
-        const estadoInicial = arb_estado || "Crecimiento";
-
+        //  GUARDAR HISTORIAL
         await guardarHistorial({
             histo_estado_anterior: null,
             histo_estado_nuevo: estadoInicial,
@@ -132,12 +136,13 @@ export const createAgroArbol = async (req: Request, res: Response) => {
         });
     }
 };
+
+
 // ─────────────────────────────────────────
 // PUT - actualizar árbol + historial si cambia estado
 // ─────────────────────────────────────────
 export const updateAgroArbol = async (req: Request, res: Response) => {
     try {
-
         const { id } = req.params;
 
         const arbol = await agroArbolRepo.findOne({
@@ -151,35 +156,62 @@ export const updateAgroArbol = async (req: Request, res: Response) => {
             });
         }
 
-        const { arb_posicion_surco, arb_estado } = req.body;
+        const { 
+            arb_posicion_surco, 
+            arb_fecha_siembra,
+            tipar_tipo_arbol,
+            arb_estado,
+            sur_surcos
+        } = req.body;
 
-        // SOLO campos normales (NO estado)
+        // ───── CAMPOS NORMALES ─────
         if (arb_posicion_surco !== undefined) {
             arbol.arb_posicion_surco = Number(arb_posicion_surco);
-            await agroArbolRepo.save(arbol);
         }
 
-        // CAMBIO DE ESTADO SOLO POR HISTORIAL
-        if (arb_estado && arb_estado !== arbol.arb_estado) {
+        if (arb_fecha_siembra !== undefined) {
+            arbol.arb_fecha_siembra = arb_fecha_siembra;
+        }
+
+        if (tipar_tipo_arbol !== undefined) {
+            arbol.tipar_tipo_arbol = Number(tipar_tipo_arbol);
+        }
+
+        if (sur_surcos !== undefined) {
+            arbol.sur_surcos = Number(sur_surcos);
+        }
+
+        // ───── ESTADO ─────
+        
+        const estadoNuevo = arb_estado || arbol.arb_estado;
+        if (estadoNuevo && estadoNuevo !== arbol.arb_estado) {
+
             await guardarHistorial({
                 histo_estado_anterior: arbol.arb_estado,
-                histo_estado_nuevo: arb_estado,
+                histo_estado_nuevo: estadoNuevo,
                 arb_arbol: arbol.arb_arbol,
                 histo_motivo: "Cambio de estado",
                 usu_usuario: 1
             });
+
+            arbol.arb_estado = estadoNuevo;
         }
+
+        // GUARDAR SIEMPRE
+        await agroArbolRepo.save(arbol);
 
         res.json({
             ok: true,
             message: "Árbol actualizado correctamente"
         });
 
-    } catch (error) {
+    } catch (error: any) {
+        console.error("ERROR REAL:", error);
+
         res.status(500).json({
             ok: false,
             message: "Error al actualizar",
-            error
+            error: error.message
         });
     }
 };

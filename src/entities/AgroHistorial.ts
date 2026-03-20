@@ -1,9 +1,9 @@
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("AGRO_HISTORIAL")
 export class AgroHistorial {
 
-    @PrimaryColumn({ name: "HISTO_HISTORIAL", type: "number" })
+    @PrimaryGeneratedColumn({ name: "HISTO_HISTORIAL" })
     histo_historial: number;
 
     @Column({ name: "HISTO_ESTADO_ANTERIOR", type: "varchar2", length: 20, nullable: true })
