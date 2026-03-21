@@ -1,16 +1,13 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { AgroArbol } from "../entities/AgroArbol";
-import { AgroHistorial } from "../entities/AgroHistorial";
+
 
 const agroArbolRepo = AppDataSource.getRepository(AgroArbol);
-const historialRepo = AppDataSource.getRepository(AgroHistorial);
 
-//  función reutilizable
-const guardarHistorial = async (data: any) => {
-    const historial = historialRepo.create(data);
-    await historialRepo.save(historial);
-};
+
+
+
 
 // ─────────────────────────────────────────
 // GET - listar árboles
@@ -98,25 +95,22 @@ export const createAgroArbol = async (req: Request, res: Response) => {
             });
         }
 
+        //  DEFINIR ESTADO INICIAL
+        const estadoInicial = arb_estado || "Crecimiento";
+
+        //  CREAR ÁRBOL CON ESTADO (ANTES NO LO TENÍAS)
         const nuevoArbol = agroArbolRepo.create({
             arb_posicion_surco: Number(arb_posicion_surco),
             arb_fecha_siembra,
             tipar_tipo_arbol: Number(tipar_tipo_arbol),
             sur_surcos: Number(sur_surcos),
+            arb_estado: estadoInicial, //  
             arb_activo: 1
         });
 
         await agroArbolRepo.save(nuevoArbol);
 
-        const estadoInicial = arb_estado || "Crecimiento";
-
-        await guardarHistorial({
-            histo_estado_anterior: null,
-            histo_estado_nuevo: estadoInicial,
-            arb_arbol: nuevoArbol.arb_arbol,
-            histo_motivo: "Creación del árbol",
-            usu_usuario: 1
-        });
+       
 
         res.status(201).json({
             ok: true,
@@ -132,12 +126,13 @@ export const createAgroArbol = async (req: Request, res: Response) => {
         });
     }
 };
+
+
 // ─────────────────────────────────────────
 // PUT - actualizar árbol + historial si cambia estado
 // ─────────────────────────────────────────
 export const updateAgroArbol = async (req: Request, res: Response) => {
     try {
-
         const { id } = req.params;
 
         const arbol = await agroArbolRepo.findOne({
@@ -151,35 +146,55 @@ export const updateAgroArbol = async (req: Request, res: Response) => {
             });
         }
 
-        const { arb_posicion_surco, arb_estado } = req.body;
+        const { 
+            arb_posicion_surco, 
+            arb_fecha_siembra,
+            tipar_tipo_arbol,
+            arb_estado,
+            sur_surcos
+        } = req.body;
 
-        // SOLO campos normales (NO estado)
+        // ───── CAMPOS NORMALES ─────
         if (arb_posicion_surco !== undefined) {
             arbol.arb_posicion_surco = Number(arb_posicion_surco);
-            await agroArbolRepo.save(arbol);
         }
 
-        // CAMBIO DE ESTADO SOLO POR HISTORIAL
-        if (arb_estado && arb_estado !== arbol.arb_estado) {
-            await guardarHistorial({
-                histo_estado_anterior: arbol.arb_estado,
-                histo_estado_nuevo: arb_estado,
-                arb_arbol: arbol.arb_arbol,
-                histo_motivo: "Cambio de estado",
-                usu_usuario: 1
-            });
+        if (arb_fecha_siembra !== undefined) {
+            arbol.arb_fecha_siembra = arb_fecha_siembra;
         }
+
+        if (tipar_tipo_arbol !== undefined) {
+            arbol.tipar_tipo_arbol = Number(tipar_tipo_arbol);
+        }
+
+        if (sur_surcos !== undefined) {
+            arbol.sur_surcos = Number(sur_surcos);
+        }
+
+        // ───── ESTADO ─────
+        
+        const estadoNuevo = arb_estado || arbol.arb_estado;
+        if (estadoNuevo && estadoNuevo !== arbol.arb_estado) {
+
+
+            arbol.arb_estado = estadoNuevo;
+        }
+
+        // GUARDAR SIEMPRE
+        await agroArbolRepo.save(arbol);
 
         res.json({
             ok: true,
             message: "Árbol actualizado correctamente"
         });
 
-    } catch (error) {
+    } catch (error: any) {
+        console.error("ERROR REAL:", error);
+
         res.status(500).json({
             ok: false,
             message: "Error al actualizar",
-            error
+            error: error.message
         });
     }
 };
@@ -207,14 +222,7 @@ export const deleteAgroArbol = async (req: Request, res: Response) => {
         arbol.arb_activo = 0;
         await agroArbolRepo.save(arbol);
 
-        // estado válido (IMPORTANTE)
-        await guardarHistorial({
-            histo_estado_anterior: arbol.arb_estado,
-            histo_estado_nuevo: "Muerto",
-            arb_arbol: arbol.arb_arbol,
-            histo_motivo: "Eliminación lógica",
-            usu_usuario: 1
-        });
+       
 
         res.json({
             ok: true,
