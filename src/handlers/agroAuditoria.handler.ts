@@ -10,11 +10,14 @@ export const getAgroAuditorias = async (req: Request, res: Response) => {
         const { tabla, accion, usuario, desde, hasta } = req.query;
         const where: any = {};
 
-        if (tabla)   where.aud_tabla   = Like(`%${tabla}%`);
-        if (accion)  where.aud_accion  = accion;
-        if (usuario) where.aud_usuario = Like(`%${usuario}%`);
+        if (tabla)   where.audi_tabla          = Like(`%${tabla}%`);
+        if (accion)  where.audi_accion         = accion;
+        if (usuario) where.audi_usuario_nombre = Like(`%${usuario}%`);
         if (desde && hasta) {
-            where.aud_fecha = Between(new Date(desde as string), new Date(hasta as string));
+            where.audi_fecha = Between(
+                new Date(desde as string),
+                new Date(hasta as string)
+            );
         }
 
         const auditorias = await repo.find({
@@ -24,7 +27,38 @@ export const getAgroAuditorias = async (req: Request, res: Response) => {
         });
 
         res.json({ ok: true, auditorias });
+
     } catch (error) {
         res.status(500).json({ ok: false, message: "Error al obtener auditoría", error });
     }
+};
+    export const getAuditoriaById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        const auditoria = await repo.findOne({
+            where: { audi_auditoria: Number(id) }
+        });
+
+        if (!auditoria) {
+            return res.status(404).json({
+                ok: false,
+                message: "Registro no encontrado"
+            });
+        }
+
+        res.json({
+            ok: true,
+            auditoria
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            message: "Error al obtener registro",
+            error
+        });
+    }
+
+
 };
