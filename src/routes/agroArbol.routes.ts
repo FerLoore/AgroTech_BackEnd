@@ -4,11 +4,13 @@ import {
     getAgroArbolById,
     createAgroArbol,
     updateAgroArbol,
-    deleteAgroArbol
+    deleteAgroArbol,
+    getPosicionesOcupadas
 } from "../handlers/agroArbol.handler";
 
 const router = Router();
 
+router.get("/posiciones-ocupadas", getPosicionesOcupadas);
 router.get("/", getAgroArboles);
 router.get("/:id", getAgroArbolById);
 router.post("/", createAgroArbol);
