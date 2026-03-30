@@ -9,10 +9,12 @@ import agroProductoRoutes from "./routes/agroProducto.routes";
 import agroAlertaSaludRoutes from "./routes/agroAlertaSalud.routes";
 import agroAnalisisLaboratorioRoutes from "./routes/agroAnalisisLaboratorio.routes";
 import agroTratamientosRoutes from "./routes/agroTratamientos.routes";
-import agroClimaRoutes  from "./routes/agroClima.routes";
+import agroClimaRoutes from "./routes/agroClima.routes";
 import agroFincaRoutes from "./routes/agroFinca.routes";
 import agroUsuarioRoutes from "./routes/agroUsuario.routes";
 import agroSeccionRoutes from "./routes/agroSeccion.routes";
+import agroFincaMapaRoutes from "./routes/agroFincaMapa.routes";
+import agroFincaPerimetroRoutes from "./routes/agroFincaPerimetro.routes";
 
 // Cada dev agrega su línea aquí al terminar su módulo
 // Dev 1 → agroRol, agroTipoArbol, agroCatalogoPatogeno, agroProducto
@@ -41,7 +43,9 @@ router.use("/agro-alerta-salud", agroAlertaSaludRoutes);
 router.use("/agro-analisis-laboratorio", agroAnalisisLaboratorioRoutes);
 router.use("/agro-tratamientos", agroTratamientosRoutes);
 
-
+//Mapas y Perímetros
+router.use("/agro-finca-mapa", agroFincaMapaRoutes);
+router.use("/agro-finca-perimetro", agroFincaPerimetroRoutes);
 
 // Dev 3 → agroSurco, agroArbol, agroHistorial
 router.use("/agro-surcos", agroSurcoRoutes);
