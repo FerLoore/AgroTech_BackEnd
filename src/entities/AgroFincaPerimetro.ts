@@ -1,9 +1,11 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from "typeorm";
-import { AgroFinca } from "./AgroFinca";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity("AGRO_FINCA_PERIMETRO")
 export class AgroFincaPerimetro {
-    @PrimaryColumn({ name: "PERIM_PERIMETRO", type: "number" })
+
+    // ✅ PrimaryGeneratedColumn — el trigger de Oracle asigna el ID
+    // Tu versión usaba PrimaryColumn que requiere que el frontend envíe el ID manualmente
+    @PrimaryGeneratedColumn({ name: "PERIM_PERIMETRO" })
     perim_perimetro: number;
 
     @Column({ name: "FIN_FINCA", type: "number" })
