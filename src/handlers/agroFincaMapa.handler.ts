@@ -19,7 +19,7 @@ export const getMapaFincaCompleto = async (req: Request, res: Response) => {
             return res.status(404).json({ ok: false, message: "Finca no encontrada o inactiva." });
         }
 
-        if (!finca.fin_latitud_origen || !finca.fin_longitud_origen) {
+        if (finca.fin_latitud_origen == null || finca.fin_longitud_origen == null) {
             return res.status(400).json({
                 ok: false,
                 message: "La finca no tiene coordenadas de origen configuradas. Actualiza FIN_LATITUD_ORIGEN y FIN_LONGITUD_ORIGEN."
