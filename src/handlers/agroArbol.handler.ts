@@ -237,22 +237,3 @@ export const deleteAgroArbol = async (req: Request, res: Response) => {
         });
     }
 };
-export const getPosicionesOcupadas = async (req: Request, res: Response) => {
-    try {
-        const { surco } = req.query;
-
-        const arboles = await agroArbolRepo.find({
-            where: {
-                sur_surcos: Number(surco),
-                arb_activo: 1
-            },
-            select: ["arb_posicion_surco"]
-        });
-
-        const posiciones = arboles.map(a => a.arb_posicion_surco);
-        res.json({ ok: true, posiciones });
-
-    } catch (error) {
-        res.status(500).json({ ok: false, message: "Error", error });
-    }
-};
