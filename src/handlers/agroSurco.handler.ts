@@ -9,13 +9,27 @@ const agroSurcoRepo = AppDataSource.getRepository(AgroSurco);
 // ─────────────────────────────────────────────
 export const getAgroSurcos = async (req: Request, res: Response) => {
     try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 1000;
+        const skip = (page - 1) * limit;
 
-        const surcos = await agroSurcoRepo.find({
+        const [surcos, total] = await agroSurcoRepo.findAndCount({
             where: { sur_activo: 1 },
-            order: { sur_numero_surco: "ASC" }
+            order: { sur_numero_surco: "ASC" },
+            take: limit,
+            skip: skip
         });
 
-        res.json({ ok: true, surcos });
+        const totalPages = Math.ceil(total / limit);
+
+        res.json({
+            ok: true,
+            surcos,
+            total,
+            totalPages,
+            page,
+            limit
+        });
 
     } catch (error) {
         res.status(500).json({ ok: false, message: "Error al obtener surcos", error });
