@@ -14,14 +14,24 @@ const agroArbolRepo = AppDataSource.getRepository(AgroArbol);
 // ─────────────────────────────────────────
 export const getAgroArboles = async (req: Request, res: Response) => {
     try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 100;
+        const skip = (page - 1) * limit;
 
-        const arboles = await agroArbolRepo.find({
-            where: { arb_activo: 1 }
+        const [arboles, total] = await agroArbolRepo.findAndCount({
+            where: { arb_activo: 1 },
+            skip: skip,
+            take: limit,
+            order: { arb_arbol: 'DESC' }
         });
 
         res.json({
             ok: true,
-            arboles
+            arboles,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
         });
 
     } catch (error) {
