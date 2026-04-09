@@ -20,4 +20,10 @@ export class AgroProducto {
 
     @Column({ name: "PRODU_ACTIVO", type: "number", default: 1 })
     produ_activo: number;
+
+    @Column({ name: "PRODU_STOCK", type: "number", default: 0 })
+    produ_stock: number;
+
+    @Column({ name: "PRODU_STOCK_MINIMO", type: "number", default: 5 })
+    produ_stock_minimo: number;
 }

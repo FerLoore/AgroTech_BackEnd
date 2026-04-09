@@ -6,7 +6,7 @@ export class AgroClima {
     @PrimaryGeneratedColumn({ name: "CLIM_CLIMA" })
     clim_clima: number;
 
-    @Column({ name: "CLIM_FECHA", type: "timestamp", default:() => "SYSTIMESTAMP" })
+    @Column({ name: "CLIM_FECHA", type: "date"})
     clim_fecha: Date;
 
     @Column({ name: "CLIM_TEMPERATURA", type: "number", precision: 5, scale: 2, nullable: true })

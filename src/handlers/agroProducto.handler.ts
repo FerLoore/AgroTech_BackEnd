@@ -58,7 +58,7 @@ export const getAgroProductoById = async (req: Request, res: Response) => {
 
 // ─────────────────────────────────────────────────────────────
 // POST /api/agro-producto
-// Body: { produ_nombre, produ_tipo, produ_concentracion, produ_unidad }
+// Body: { produ_nombre, produ_tipo, produ_concentracion, produ_unidad, produ_stock, produ_stock_minimo }
 // ─────────────────────────────────────────────────────────────
 export const createAgroProducto = async (req: Request, res: Response) => {
     try {
@@ -66,7 +66,9 @@ export const createAgroProducto = async (req: Request, res: Response) => {
             produ_nombre,
             produ_tipo,
             produ_concentracion,
-            produ_unidad
+            produ_unidad,
+            produ_stock,          // <-- Extraemos el stock
+            produ_stock_minimo    // <-- Extraemos el stock mínimo
         } = req.body;
 
         // Validar campos requeridos
@@ -94,6 +96,8 @@ export const createAgroProducto = async (req: Request, res: Response) => {
             produ_tipo,
             produ_concentracion,
             produ_unidad,
+            produ_stock: produ_stock !== undefined ? Number(produ_stock) : 0,               // <-- Lo guardamos (por defecto 0)
+            produ_stock_minimo: produ_stock_minimo !== undefined ? Number(produ_stock_minimo) : 5, // <-- Lo guardamos (por defecto 5)
             produ_activo: 1
         });
 
@@ -112,7 +116,7 @@ export const createAgroProducto = async (req: Request, res: Response) => {
 
 // ─────────────────────────────────────────────────────────────
 // PUT /api/agro-producto/:id
-// Body: { produ_nombre, produ_tipo, produ_concentracion, produ_unidad }
+// Body: { produ_nombre, produ_tipo, produ_concentracion, produ_unidad, produ_stock, produ_stock_minimo }
 // ─────────────────────────────────────────────────────────────
 export const updateAgroProducto = async (req: Request, res: Response) => {
     try {
@@ -121,7 +125,9 @@ export const updateAgroProducto = async (req: Request, res: Response) => {
             produ_nombre,
             produ_tipo,
             produ_concentracion,
-            produ_unidad
+            produ_unidad,
+            produ_stock,         // <-- Extraemos el stock
+            produ_stock_minimo   // <-- Extraemos el stock mínimo
         } = req.body;
 
         const producto = await agroProductoRepo.findOne({
@@ -140,6 +146,10 @@ export const updateAgroProducto = async (req: Request, res: Response) => {
         if (produ_tipo          !== undefined) producto.produ_tipo          = produ_tipo;
         if (produ_concentracion !== undefined) producto.produ_concentracion = produ_concentracion;
         if (produ_unidad        !== undefined) producto.produ_unidad        = produ_unidad;
+        
+        // <-- Agregamos la actualización de los nuevos campos
+        if (produ_stock         !== undefined) producto.produ_stock         = Number(produ_stock);
+        if (produ_stock_minimo  !== undefined) producto.produ_stock_minimo  = Number(produ_stock_minimo);
 
         await agroProductoRepo.save(producto);
 
