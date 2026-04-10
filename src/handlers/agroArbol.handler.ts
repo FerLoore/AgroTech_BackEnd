@@ -14,14 +14,24 @@ const agroArbolRepo = AppDataSource.getRepository(AgroArbol);
 // ─────────────────────────────────────────
 export const getAgroArboles = async (req: Request, res: Response) => {
     try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 100;
+        const skip = (page - 1) * limit;
 
-        const arboles = await agroArbolRepo.find({
-            where: { arb_activo: 1 }
+        const [arboles, total] = await agroArbolRepo.findAndCount({
+            where: { arb_activo: 1 },
+            skip: skip,
+            take: limit,
+            order: { arb_arbol: 'DESC' }
         });
 
         res.json({
             ok: true,
-            arboles
+            arboles,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
         });
 
     } catch (error) {
@@ -74,7 +84,6 @@ export const getAgroArbolById = async (req: Request, res: Response) => {
 // ─────────────────────────────────────────
 export const createAgroArbol = async (req: Request, res: Response) => {
     try {
-
         const {
             arb_posicion_surco,
             arb_fecha_siembra,
@@ -83,34 +92,37 @@ export const createAgroArbol = async (req: Request, res: Response) => {
             sur_surcos
         } = req.body;
 
+        // Log para ver qué está llegando realmente desde el front
+        console.log("Recibiendo árbol:", req.body);
+
+        // Validación más permisiva: permitimos que arb_fecha_siembra pueda ser opcional 
+        // si la base de datos tiene un default, o la manejamos aquí.
         if (
             arb_posicion_surco == null ||
-            arb_fecha_siembra == null ||
             tipar_tipo_arbol == null ||
             sur_surcos == null
         ) {
             return res.status(400).json({
                 ok: false,
-                message: "Faltan campos obligatorios"
+                message: "Faltan campos obligatorios: posicion, tipo o surco"
             });
         }
 
-        //  DEFINIR ESTADO INICIAL
         const estadoInicial = arb_estado || "Crecimiento";
 
-        //  CREAR ÁRBOL CON ESTADO (ANTES NO LO TENÍAS)
+        // Si la fecha llega vacía, usamos la fecha actual del servidor
+        const fechaFinal = arb_fecha_siembra ? new Date(arb_fecha_siembra) : new Date();
+
         const nuevoArbol = agroArbolRepo.create({
             arb_posicion_surco: Number(arb_posicion_surco),
-            arb_fecha_siembra,
+            arb_fecha_siembra: fechaFinal,
             tipar_tipo_arbol: Number(tipar_tipo_arbol),
             sur_surcos: Number(sur_surcos),
-            arb_estado: estadoInicial, //  
+            arb_estado: estadoInicial,
             arb_activo: 1
         });
 
         await agroArbolRepo.save(nuevoArbol);
-
-       
 
         res.status(201).json({
             ok: true,
@@ -118,11 +130,12 @@ export const createAgroArbol = async (req: Request, res: Response) => {
             arbol: nuevoArbol
         });
 
-    } catch (error) {
+    } catch (error: any) {
+        console.error("ERROR AL CREAR ÁRBOL:", error);
         res.status(500).json({
             ok: false,
             message: "Error al crear el árbol",
-            error
+            error: error.message
         });
     }
 };
@@ -146,8 +159,8 @@ export const updateAgroArbol = async (req: Request, res: Response) => {
             });
         }
 
-        const { 
-            arb_posicion_surco, 
+        const {
+            arb_posicion_surco,
             arb_fecha_siembra,
             tipar_tipo_arbol,
             arb_estado,
@@ -172,7 +185,7 @@ export const updateAgroArbol = async (req: Request, res: Response) => {
         }
 
         // ───── ESTADO ─────
-        
+
         const estadoNuevo = arb_estado || arbol.arb_estado;
         if (estadoNuevo && estadoNuevo !== arbol.arb_estado) {
 
@@ -222,7 +235,7 @@ export const deleteAgroArbol = async (req: Request, res: Response) => {
         arbol.arb_activo = 0;
         await agroArbolRepo.save(arbol);
 
-       
+
 
         res.json({
             ok: true,

@@ -3,7 +3,7 @@ import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn } from "typeorm";
 @Entity("AGRO_ARBOL")
 export class AgroArbol {
 
-    @PrimaryGeneratedColumn({ name: "ARB_ARBOL", type: "number" })
+    @PrimaryColumn({ name: "ARB_ARBOL", type: "number" })
     arb_arbol: number;
 
     @Column({ name: "ARB_POSICION_SURCO", type: "number" })

@@ -12,12 +12,18 @@ export class AgroFinca {
     @Column({ name: "FIN_UBICACION", type: "varchar2", length: 255, nullable: true })
     fin_ubicacion: string;
 
-    @Column({ name: "FIN_HECTAREA", type: "number", precision: 10, scale: 2, nullable: true})
+    @Column({ name: "FIN_HECTAREA", type: "number", precision: 10, scale: 2, nullable: true })
     fin_hectarea: number;
-    
+
     @Column({ name: "USU_USUARIO", type: "number" })
     usu_usuario: number;
-    
+
     @Column({ name: "FIN_ACTIVO", type: "number", default: 1 })
     fin_activo: number;
+
+    @Column({ name: "FIN_LATITUD_ORIGEN", type: "number", precision: 10, scale: 7, nullable: true })
+    fin_latitud_origen: number;
+
+    @Column({ name: "FIN_LONGITUD_ORIGEN", type: "number", precision: 10, scale: 7, nullable: true })
+    fin_longitud_origen: number;
 }
