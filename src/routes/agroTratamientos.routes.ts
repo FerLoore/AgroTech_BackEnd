@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getTratamientos,
   getTratamientoById,
+  getTratamientosByArbol,
   createTratamiento,
   updateTratamiento,
   deleteTratamiento
@@ -11,6 +12,9 @@ const router = Router();
 
 // GET todos
 router.get("/", getTratamientos);
+
+// GET por árbol
+router.get("/arbol/:id", getTratamientosByArbol);
 
 // GET por ID
 router.get("/:id", getTratamientoById);

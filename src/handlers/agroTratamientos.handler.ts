@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { AgroTratamientos } from "../entities/AgroTratamientos";
+import { AgroAlertaSalud } from "../entities/AgroAlertaSalud";
 
 const tratamientosRepo = AppDataSource.getRepository(AgroTratamientos);
 
@@ -84,5 +85,22 @@ export const deleteTratamiento = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error eliminando tratamiento:", error);
     res.status(500).json({ message: "Error eliminando tratamiento" });
+  }
+};
+
+// GET tratamientos filtrados por árbol específico
+export const getTratamientosByArbol = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const tratamientos = await tratamientosRepo.createQueryBuilder("tratamiento")
+      .innerJoin(AgroAlertaSalud, "alerta", "tratamiento.alertsalu_alerta_salud = alerta.alertsalud_id")
+      .where("alerta.arb_arbol = :arbolId", { arbolId: Number(id) })
+      .orderBy("tratamiento.trata_fecha_inicio", "DESC")
+      .getMany();
+      
+    res.json(tratamientos);
+  } catch (error) {
+    console.error("Error buscando tratamientos por árbol:", error);
+    res.status(500).json({ message: "Error buscando tratamientos por árbol" });
   }
 };
