@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { AgroSeccion } from "../entities/AgroSeccion";
+import { AgroSurco } from "../entities/AgroSurco";
+import { AgroArbol } from "../entities/AgroArbol";
+import { AgroFincaPerimetro } from "../entities/AgroFincaPerimetro";
 
 const agroSeccionRepo = AppDataSource.getRepository(AgroSeccion);
 
@@ -115,26 +118,53 @@ export const updateAgroSeccion = async (req: Request, res: Response) => {
 };
 
 // ─────────────────────────────────────────────────────────────
-// DELETE /api/agro-seccion/:id (Borrado Lógico)
+// DELETE /api/agro-seccion/:id (Borrado Lógico en Cascada)
 // ─────────────────────────────────────────────────────────────
 export const deleteAgroSeccion = async (req: Request, res: Response) => {
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
         const { id } = req.params;
+        const seccionId = Number(id);
 
-        const seccion = await agroSeccionRepo.findOne({
-            where: { secc_seccion: Number(id), secc_activo: 1 }
+        const seccion = await queryRunner.manager.findOne(AgroSeccion, {
+            where: { secc_seccion: seccionId, secc_activo: 1 }
         });
 
         if (!seccion) {
             return res.status(404).json({ ok: false, message: `Sección con ID ${id} no encontrada` });
         }
 
-        // Desactivamos la sección
+        // 1. Desactivar la SECCIÓN
         seccion.secc_activo = 0;
-        await agroSeccionRepo.save(seccion);
+        await queryRunner.manager.save(seccion);
 
-        res.json({ ok: true, message: "Sección desactivada exitosamente" });
+        // 2. Desactivar SURCOS de la sección
+        await queryRunner.manager.update(AgroSurco, { secc_secciones: seccionId }, { sur_activo: 0 });
+
+        // 3. Desactivar ÁRBOLES de esos surcos
+        const surcos = await queryRunner.manager.find(AgroSurco, { where: { secc_secciones: seccionId } });
+        const surcoIds = surcos.map(s => s.sur_surco);
+
+        if (surcoIds.length > 0) {
+            for (const sId of surcoIds) {
+                await queryRunner.manager.update(AgroArbol, { sur_surcos: sId }, { arb_activo: 0 });
+            }
+        }
+
+        // 4. Eliminar PERÍMETRO asociado a esta sección
+        await queryRunner.manager.delete(AgroFincaPerimetro, { secc_seccion: seccionId });
+
+        await queryRunner.commitTransaction();
+        res.json({ ok: true, message: "Terreno (sección, surcos, árboles y perímetro) eliminado exitosamente" });
+
     } catch (error) {
-        res.status(500).json({ ok: false, message: "Error al desactivar la sección", error });
+        await queryRunner.rollbackTransaction();
+        console.error("Error al eliminar terreno:", error);
+        res.status(500).json({ ok: false, message: "Error al eliminar el terreno", error });
+    } finally {
+        await queryRunner.release();
     }
 };

@@ -81,7 +81,7 @@ export const createAgroFinca = async (req: Request, res: Response) => {
 export const updateAgroFinca = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { fin_nombre, fin_ubicacion, fin_hectarea, usu_usuario } = req.body;
+        const { fin_nombre, fin_ubicacion, fin_hectarea, usu_usuario, fin_latitud_origen, fin_longitud_origen } = req.body;
 
         const finca = await agroFincaRepo.findOne({
             where: { fin_finca: Number(id), fin_activo: 1 }
@@ -95,12 +95,15 @@ export const updateAgroFinca = async (req: Request, res: Response) => {
         if (fin_ubicacion !== undefined) finca.fin_ubicacion = fin_ubicacion;
         if (fin_hectarea !== undefined) finca.fin_hectarea = Number(fin_hectarea);
         if (usu_usuario !== undefined) finca.usu_usuario = Number(usu_usuario);
+        if (fin_latitud_origen !== undefined) finca.fin_latitud_origen = Number(fin_latitud_origen);
+        if (fin_longitud_origen !== undefined) finca.fin_longitud_origen = Number(fin_longitud_origen);
 
         await agroFincaRepo.save(finca);
 
         res.json({ ok: true, message: "Finca actualizada exitosamente", finca });
-    } catch (error) {
-        res.status(500).json({ ok: false, message: "Error al actualizar la finca", error });
+    } catch (error: any) {
+        console.error("ERROR EN UPDATE FINCA:", error);
+        res.status(500).json({ ok: false, message: "Error al actualizar la finca", error: error.message || error });
     }
 };
 

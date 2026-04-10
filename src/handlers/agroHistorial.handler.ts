@@ -10,16 +10,27 @@ const historialRepo = AppDataSource.getRepository(AgroHistorial);
 export const getHistoriales = async (req: Request, res: Response) => {
 
     try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 1000;
+        const skip = (page - 1) * limit;
 
-        const historiales = await historialRepo.find({
+        const [historiales, total] = await historialRepo.findAndCount({
             order: {
-                histo_fecha_cambio: "DESC" //  más reciente primero
-            }
+                histo_fecha_cambio: "DESC" // más reciente primero
+            },
+            take: limit,
+            skip: skip
         });
+
+        const totalPages = Math.ceil(total / limit);
 
         res.json({
             ok: true,
-            historiales
+            historiales,
+            total,
+            totalPages,
+            page,
+            limit
         });
 
     } catch (error) {

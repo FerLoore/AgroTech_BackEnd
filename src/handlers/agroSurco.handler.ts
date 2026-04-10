@@ -9,13 +9,27 @@ const agroSurcoRepo = AppDataSource.getRepository(AgroSurco);
 // ─────────────────────────────────────────────
 export const getAgroSurcos = async (req: Request, res: Response) => {
     try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 1000;
+        const skip = (page - 1) * limit;
 
-        const surcos = await agroSurcoRepo.find({
+        const [surcos, total] = await agroSurcoRepo.findAndCount({
             where: { sur_activo: 1 },
-            order: { sur_numero_surco: "ASC" }
+            order: { sur_numero_surco: "ASC" },
+            take: limit,
+            skip: skip
         });
 
-        res.json({ ok: true, surcos });
+        const totalPages = Math.ceil(total / limit);
+
+        res.json({
+            ok: true,
+            surcos,
+            total,
+            totalPages,
+            page,
+            limit
+        });
 
     } catch (error) {
         res.status(500).json({ ok: false, message: "Error al obtener surcos", error });
@@ -52,42 +66,28 @@ export const getAgroSurcoById = async (req: Request, res: Response) => {
 // ─────────────────────────────────────────────
 // POST /api/agro-surcos
 // ─────────────────────────────────────────────
-export const createAgroSurco = async (req: Request, res: Response) => {
-
+// En el controlador del backend
+export const createAgroSurco = async (req, res) => {
     try {
-
-        const {
-            sur_numero_surco,
-            sur_orientacion,
-            sur_espaciamiento,
-            secc_secciones
-        } = req.body;
-
-        if (!sur_numero_surco || !secc_secciones) {
-            return res.status(400).json({
-                ok: false,
-                message: "Campos requeridos: sur_numero_surco, secc_secciones"
-            });
-        }
-
-        const nuevoSurco = agroSurcoRepo.create({
-            sur_numero_surco,
-            sur_orientacion,
-            sur_espaciamiento,
-            secc_secciones,
-            sur_activo: 1
-        });
-
+        const nuevoSurco = agroSurcoRepo.create(req.body);
         await agroSurcoRepo.save(nuevoSurco);
+
+        // FIX CRÍTICO PARA ORACLE:
+        // Buscamos el surco que acabamos de insertar para obtener el ID real generado por el Trigger
+        const surcoConId = await agroSurcoRepo.findOne({
+            where: {
+                sur_numero_surco: req.body.sur_numero_surco,
+                secc_secciones: req.body.secc_secciones
+            },
+            order: { sur_surco: 'DESC' } // Traer el más reciente
+        });
 
         res.status(201).json({
             ok: true,
-            message: "Surco creado exitosamente",
-            surco: nuevoSurco
+            surco: surcoConId // Ahora sur_surco NO será null
         });
-
     } catch (error) {
-        res.status(500).json({ ok: false, message: "Error al crear el surco", error });
+        res.status(500).json({ ok: false, error: error.message });
     }
 };
 
