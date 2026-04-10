@@ -86,6 +86,7 @@ export const getMapaFincaCompleto = async (req: Request, res: Response) => {
                 orden: p.perim_orden,
                 lat: p.perim_latitud,
                 lng: p.perim_longitud,
+                seccion_id: p.secc_seccion,
             })),
             arboles,
         });

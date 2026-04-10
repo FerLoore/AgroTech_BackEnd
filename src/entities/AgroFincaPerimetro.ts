@@ -4,7 +4,6 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 export class AgroFincaPerimetro {
 
     // ✅ PrimaryGeneratedColumn — el trigger de Oracle asigna el ID
-    // Tu versión usaba PrimaryColumn que requiere que el frontend envíe el ID manualmente
     @PrimaryGeneratedColumn({ name: "PERIM_PERIMETRO" })
     perim_perimetro: number;
 
@@ -19,4 +18,7 @@ export class AgroFincaPerimetro {
 
     @Column({ name: "PERIM_LONGITUD", type: "number", precision: 10, scale: 7 })
     perim_longitud: number;
+
+    @Column({ name: "SECC_SECCIONES", type: "number", nullable: true })
+    secc_seccion: number;
 }

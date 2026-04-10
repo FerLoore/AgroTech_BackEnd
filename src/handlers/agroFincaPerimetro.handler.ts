@@ -8,10 +8,14 @@ import { AgroFincaPerimetro } from "../entities/AgroFincaPerimetro";
 export const getPerimetro = async (req: Request, res: Response) => {
     try {
         const fincaId = Number(req.params.fincaId);
+        const { seccionId } = req.query;
         const perimetroRepo = AppDataSource.getRepository(AgroFincaPerimetro);
 
+        const where: any = { fin_finca: fincaId };
+        if (seccionId) where.secc_seccion = Number(seccionId);
+
         const perimetro = await perimetroRepo.find({
-            where: { fin_finca: fincaId },
+            where,
             order: { perim_orden: "ASC" }
         });
 
@@ -33,17 +37,24 @@ export const guardarPerimetro = async (req: Request, res: Response) => {
 
     try {
         const fincaId = Number(req.params.fincaId);
-        const { puntos } = req.body;
+        const { puntos, seccionId } = req.body;
+        console.log("POST /agro-finca-perimetro req.body:", req.body);
 
-        if (!puntos || !Array.isArray(puntos) || puntos.length < 3) {
-            return res.status(400).json({
-                ok: false,
-                message: "Se necesitan al menos 3 puntos para definir un perímetro."
-            });
+        if (!puntos) {
+            return res.status(400).json({ ok: false, message: "⚠️ No se recibieron puntos." });
+        }
+        if (!Array.isArray(puntos) || puntos.length < 3) {
+            return res.status(400).json({ ok: false, message: "⚠️ Se necesitan al menos 3 puntos." });
+        }
+        if (!seccionId) {
+            return res.status(400).json({ ok: false, message: "⚠️ Se requiere el seccionId para asociar el perímetro." });
         }
 
-        // Borra perímetro anterior
-        await queryRunner.manager.delete(AgroFincaPerimetro, { fin_finca: fincaId });
+        // Borra perímetro anterior de esta SECCIÓN
+        await queryRunner.manager.delete(AgroFincaPerimetro, { 
+            fin_finca: fincaId, 
+            secc_seccion: Number(seccionId) 
+        });
 
         // Inserta nuevos puntos
         // ✅ El trigger TRG_AGRO_FINCA_PERIMETRO asigna PERIM_PERIMETRO automáticamente
@@ -54,6 +65,7 @@ export const guardarPerimetro = async (req: Request, res: Response) => {
             p.perim_orden = index + 1;
             p.perim_latitud = Number(punto.lat);
             p.perim_longitud = Number(punto.lng);
+            p.secc_seccion = Number(seccionId);
             return p;
         });
 
