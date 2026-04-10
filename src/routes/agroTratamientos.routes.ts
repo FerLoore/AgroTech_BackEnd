@@ -4,24 +4,21 @@ import {
   getTratamientoById,
   createTratamiento,
   updateTratamiento,
-  deleteTratamiento
+  deleteTratamiento,
+  finalizarTratamiento // <--- Agregamos esta importación
 } from "../handlers/agroTratamientos.handler";
 
 const router = Router();
 
-// GET todos
+// Rutas CRUD estándar
 router.get("/", getTratamientos);
-
-// GET por ID
 router.get("/:id", getTratamientoById);
-
-// POST crear
 router.post("/", createTratamiento);
-
-// PUT actualizar
 router.put("/:id", updateTratamiento);
-
-// DELETE eliminar
 router.delete("/:id", deleteTratamiento);
+
+// Ruta de lógica de negocio (Finalizar y crear historial)
+// Usamos POST porque estamos ejecutando una acción que afecta múltiples tablas
+router.post("/finalizar/:id", finalizarTratamiento);
 
 export default router;

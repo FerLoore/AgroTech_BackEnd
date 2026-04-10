@@ -13,6 +13,7 @@ import agroClimaRoutes  from "./routes/agroClima.routes";
 import agroFincaRoutes from "./routes/agroFinca.routes";
 import agroUsuarioRoutes from "./routes/agroUsuario.routes";
 import agroSeccionRoutes from "./routes/agroSeccion.routes";
+import agroFumigacionRoutes from "./routes/agroFumigacion.routes";
 
 // Cada dev agrega su línea aquí al terminar su módulo
 // Dev 1 → agroRol, agroTipoArbol, agroCatalogoPatogeno, agroProducto
@@ -22,7 +23,7 @@ import agroSeccionRoutes from "./routes/agroSeccion.routes";
 
 const router = Router();
 
-
+router.use('/agro-fumigacion', agroFumigacionRoutes);
 
 // Dev 1 → agroRol, agroTipoArbol, agroCatalogoPatogeno, agroProducto
 router.use("/agro-roles", agroRolRoutes);
@@ -41,10 +42,9 @@ router.use("/agro-alerta-salud", agroAlertaSaludRoutes);
 router.use("/agro-analisis-laboratorio", agroAnalisisLaboratorioRoutes);
 router.use("/agro-tratamientos", agroTratamientosRoutes);
 
-
-
 // Dev 3 → agroSurco, agroArbol, agroHistorial
 router.use("/agro-surcos", agroSurcoRoutes);
 router.use("/agro-arboles", agroArbolRoutes);
 router.use("/agro-historial", agroHistorialRoutes);
+
 export default router;

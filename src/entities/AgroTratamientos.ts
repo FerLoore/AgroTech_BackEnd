@@ -1,9 +1,9 @@
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity({ name: "AGRO_TRATAMIENTOS" })
 export class AgroTratamientos {
 
-  @PrimaryColumn({ name: "TRATA_TRATAMIENTOS" })
+  @PrimaryGeneratedColumn({ name: "TRATA_TRATAMIENTOS" })
   trata_tratamientos: number;
 
   @Column({ name: "TRATA_FECHA_INICIO", type: "date" })

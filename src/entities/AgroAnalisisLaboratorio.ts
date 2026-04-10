@@ -1,9 +1,9 @@
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity("AGRO_ANALISIS_LABORATORIO")
 export class AgroAnalisisLaboratorio {
 
-  @PrimaryColumn({ name: "ANALAB_ANALISIS_LABORATORIO", type: "number" })
+  @PrimaryGeneratedColumn({ name: "ANALAB_ANALISIS_LABORATORIO" })
   analab_analisis_laboratorio: number;
 
   @Column({ name: "ANALAB_LABORATORIO_NOMBRE", type: "varchar", length: 200 })

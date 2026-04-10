@@ -1,9 +1,9 @@
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity("AGRO_ALERTA_SALUD")
 export class AgroAlertaSalud {
 
-  @PrimaryColumn({ name: "ALERTSALU_ALERTA_SALUD", type: "number" })
+  @PrimaryGeneratedColumn({ name: "ALERTSALU_ALERTA_SALUD" })
   alertsalud_id: number;
 
   @Column({ name: "ALERTSALU_FECHA_DETECCION", type: "date" })
