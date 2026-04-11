@@ -18,6 +18,12 @@ export class AgroProducto {
     @Column({ name: "PRODU_UNIDAD", type: "varchar2", length: 50, nullable: true })
     produ_unidad: string;
 
+    @Column({ name: "PRODU_STOCK_ACTUAL", type: "number", default: 0 })
+    produ_stock_actual: number;
+
+    @Column({ name: "PRODU_STOCK_MINIMO", type: "number", default: 0 })
+    produ_stock_minimo: number;
+
     @Column({ name: "PRODU_ACTIVO", type: "number", default: 1 })
     produ_activo: number;
 }
