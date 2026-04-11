@@ -4,7 +4,8 @@ import {
     getAgroArbolById,
     createAgroArbol,
     updateAgroArbol,
-    deleteAgroArbol
+    deleteAgroArbol,
+    
 } from "../handlers/agroArbol.handler";
 
 const router = Router();

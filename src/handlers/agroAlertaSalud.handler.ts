@@ -95,3 +95,17 @@ export const deleteAlerta = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error eliminando alerta" });
   }
 };
+
+// GET alertas filtradas por árbol específico
+export const getAlertasByArbol = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const alertas = await alertaRepo.find({
+      where: { arb_arbol: Number(id) },
+      order: { fecha_deteccion: "DESC" }
+    });
+    res.json(alertas);
+  } catch (error) {
+    res.status(500).json({ message: "Error buscando alertas por árbol" });
+  }
+};
