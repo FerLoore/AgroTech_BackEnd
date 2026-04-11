@@ -151,17 +151,14 @@ export const updateTratamiento = async (req: Request, res: Response) => {
 
         if (arbol) {
           const arbEstadoAnterior = arbol.arb_estado;
-          arbol.arb_estado = "Sano";
-          await queryRunner.manager.save(arbol);
-
-          // Registrar historial
+          // El estado ya fue actualizado por el frontend, solo registramos historial
           const historial = queryRunner.manager.create(AgroHistorial, {
             histo_estado_anterior: arbEstadoAnterior,
-            histo_estado_nuevo: "Sano",
+            histo_estado_nuevo: arbol.arb_estado, // Usamos el estado que el árbol tiene actualmente
             histo_fecha_cambio: new Date(),
             arb_arbol: arbol.arb_arbol,
-            histo_motivo: `Tratamiento #${tratamiento.trata_tratamientos} finalizado exitosamente`,
-            usu_usuario: usu_usuario || 1 // Fallback a admin si no viene
+            histo_motivo: `Tratamiento #${tratamiento.trata_tratamientos} finalizado`,
+            usu_usuario: usu_usuario || 1
           });
           await queryRunner.manager.save(historial);
         }
