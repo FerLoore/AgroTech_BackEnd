@@ -52,6 +52,8 @@ export const getMapaFincaCompleto = async (req: Request, res: Response) => {
             JOIN AGRO_TIPO_ARBOL T ON A.TIPAR_TIPO_ARBOL  = T.TIPAR_TIPO_ARBOL
             WHERE SEC.FIN_FINCA = :fincaId
               AND A.ARB_ACTIVO  = 1
+              AND SEC.SECC_ACTIVO = 1
+              AND S.SUR_ACTIVO = 1
             ORDER BY S.SUR_NUMERO_SURCO, A.ARB_POSICION_SURCO
         `, [fincaId]);
 
