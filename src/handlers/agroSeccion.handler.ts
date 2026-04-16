@@ -24,7 +24,8 @@ export const getAgroSecciones = async (req: Request, res: Response) => {
                 "s.secc_tipo_suelo  AS \"secc_tipo_suelo\"",
                 "s.fin_finca       AS \"fin_finca\"",
                 "s.secc_activo     AS \"secc_activo\"",
-                "f.FIN_NOMBRE      AS \"fin_nombre\""
+                "f.FIN_NOMBRE      AS \"fin_nombre\"",
+                `(SELECT COUNT(*) FROM AGRO_SURCO sur JOIN AGRO_ARBOL arb ON sur.SUR_SURCO = arb.SUR_SURCOS WHERE sur.SECC_SECCIONES = s.SECC_SECCION AND sur.SUR_ACTIVO = 1 AND arb.ARB_ACTIVO = 1) AS "tiene_arboles"`
             ])
             .where("s.secc_activo = :activo", { activo: 1 });
 
