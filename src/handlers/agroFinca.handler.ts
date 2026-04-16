@@ -6,17 +6,30 @@ const agroFincaRepo = AppDataSource.getRepository(AgroFinca);
 
 // ─────────────────────────────────────────────────────────────
 // GET /api/agro-finca
-// Lista todas las fincas ACTIVAS
+// Lista todas las fincas ACTIVAS + Nombre del Dueño
 // ─────────────────────────────────────────────────────────────
 export const getAgroFincas = async (req: Request, res: Response) => {
     try {
-        const fincas = await agroFincaRepo.find({
-            where: { fin_activo: 1 },
-            order: { fin_finca: "ASC" }
-        });
+        const fincas = await agroFincaRepo.createQueryBuilder("f")
+            .leftJoin("AGRO_USUARIO", "u", "f.usu_usuario = u.USU_USUARIO")
+            .select([
+                "f.fin_finca      AS \"fin_finca\"",
+                "f.fin_nombre     AS \"fin_nombre\"",
+                "f.fin_ubicacion  AS \"fin_ubicacion\"",
+                "f.fin_hectarea   AS \"fin_hectarea\"",
+                "f.usu_usuario    AS \"usu_usuario\"",
+                "f.fin_activo     AS \"fin_activo\"",
+                "f.fin_latitud_origen  AS \"fin_latitud_origen\"",
+                "f.fin_longitud_origen AS \"fin_longitud_origen\"",
+                "u.USU_NOMBRE     AS \"usu_nombre\""
+            ])
+            .where("f.fin_activo = :activo", { activo: 1 })
+            .orderBy("f.fin_finca", "ASC")
+            .getRawMany();
 
         res.json({ ok: true, fincas });
     } catch (error) {
+        console.error("ERROR EN GET FINCAS:", error);
         res.status(500).json({ ok: false, message: "Error al obtener las fincas", error });
     }
 };
@@ -28,12 +41,22 @@ export const getAgroFincaById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const finca = await agroFincaRepo.findOne({
-            where: { 
-                fin_finca: Number(id),
-                fin_activo: 1 
-            }
-        });
+        const finca = await agroFincaRepo.createQueryBuilder("f")
+            .leftJoin("AGRO_USUARIO", "u", "f.usu_usuario = u.USU_USUARIO")
+            .select([
+                "f.fin_finca      AS \"fin_finca\"",
+                "f.fin_nombre     AS \"fin_nombre\"",
+                "f.fin_ubicacion  AS \"fin_ubicacion\"",
+                "f.fin_hectarea   AS \"fin_hectarea\"",
+                "f.usu_usuario    AS \"usu_usuario\"",
+                "f.fin_activo     AS \"fin_activo\"",
+                "f.fin_latitud_origen  AS \"fin_latitud_origen\"",
+                "f.fin_longitud_origen AS \"fin_longitud_origen\"",
+                "u.USU_NOMBRE     AS \"usu_nombre\""
+            ])
+            .where("f.fin_finca = :id", { id: Number(id) })
+            .andWhere("f.fin_activo = :activo", { activo: 1 })
+            .getRawOne();
 
         if (!finca) {
             return res.status(404).json({ ok: false, message: `Finca con ID ${id} no encontrada o inactiva` });
@@ -41,6 +64,7 @@ export const getAgroFincaById = async (req: Request, res: Response) => {
 
         res.json({ ok: true, finca });
     } catch (error) {
+        console.error("ERROR EN GET FINCA BY ID:", error);
         res.status(500).json({ ok: false, message: "Error al obtener la finca", error });
     }
 };
