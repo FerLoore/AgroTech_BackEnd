@@ -93,8 +93,8 @@ export const createTratamiento = async (req: Request, res: Response) => {
     // 4. Crear Tratamiento
     const tratamientoData = {
       ...req.body,
-      trata_fecha_inicio: req.body.trata_fecha_inicio ? new Date(req.body.trata_fecha_inicio) : new Date(),
-      trata_fecha_fin:    req.body.trata_fecha_fin    ? new Date(req.body.trata_fecha_fin)    : null,
+      trata_fecha_inicio: req.body.trata_fecha_inicio || new Date(),
+      trata_fecha_fin:    req.body.trata_fecha_fin    || null,
       alertsalu_alerta_salud: req.body.alertsalu_alerta_salud ? Number(req.body.alertsalu_alerta_salud) : null,
       secc_seccion:           req.body.secc_seccion           ? Number(req.body.secc_seccion)           : null,
       produ_producto:         Number(req.body.produ_producto),
