@@ -66,7 +66,9 @@ export const createAgroProducto = async (req: Request, res: Response) => {
             produ_nombre,
             produ_tipo,
             produ_concentracion,
-            produ_unidad
+            produ_unidad,
+            produ_stock_actual,
+            produ_stock_minimo
         } = req.body;
 
         // Validar campos requeridos
@@ -94,6 +96,8 @@ export const createAgroProducto = async (req: Request, res: Response) => {
             produ_tipo,
             produ_concentracion,
             produ_unidad,
+            produ_stock_actual: produ_stock_actual ?? 0,
+            produ_stock_minimo: produ_stock_minimo ?? 0,
             produ_activo: 1
         });
 
@@ -121,7 +125,9 @@ export const updateAgroProducto = async (req: Request, res: Response) => {
             produ_nombre,
             produ_tipo,
             produ_concentracion,
-            produ_unidad
+            produ_unidad,
+            produ_stock_actual,
+            produ_stock_minimo
         } = req.body;
 
         const producto = await agroProductoRepo.findOne({
@@ -140,6 +146,8 @@ export const updateAgroProducto = async (req: Request, res: Response) => {
         if (produ_tipo          !== undefined) producto.produ_tipo          = produ_tipo;
         if (produ_concentracion !== undefined) producto.produ_concentracion = produ_concentracion;
         if (produ_unidad        !== undefined) producto.produ_unidad        = produ_unidad;
+        if (produ_stock_actual  !== undefined) producto.produ_stock_actual  = Number(produ_stock_actual);
+        if (produ_stock_minimo  !== undefined) producto.produ_stock_minimo  = Number(produ_stock_minimo);
 
         await agroProductoRepo.save(producto);
 

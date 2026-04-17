@@ -20,4 +20,7 @@ export class AgroAlertaSalud {
 
   @Column({ name: "USU_USUARIO", type: "number" })
   usu_usuario: number;
+
+  @Column({ name: "ALERTSALU_ACTIVO", type: "number", default: 1 })
+  alertsalud_activo: number;
 }

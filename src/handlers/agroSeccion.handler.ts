@@ -9,27 +9,35 @@ const agroSeccionRepo = AppDataSource.getRepository(AgroSeccion);
 
 // ─────────────────────────────────────────────────────────────
 // GET /api/agro-seccion
-// Lista todas las secciones ACTIVAS
+// Lista todas las secciones ACTIVAS + Nombre de Finca
 // Query params opcionales: ?fincaId=1 (Para filtrar por finca)
 // ─────────────────────────────────────────────────────────────
 export const getAgroSecciones = async (req: Request, res: Response) => {
     try {
         const { fincaId } = req.query;
 
-        const where: any = { secc_activo: 1 };
+        const query = agroSeccionRepo.createQueryBuilder("s")
+            .leftJoin("AGRO_FINCA", "f", "s.fin_finca = f.FIN_FINCA")
+            .select([
+                "s.secc_seccion    AS \"secc_seccion\"",
+                "s.secc_nombre     AS \"secc_nombre\"",
+                "s.secc_tipo_suelo  AS \"secc_tipo_suelo\"",
+                "s.fin_finca       AS \"fin_finca\"",
+                "s.secc_activo     AS \"secc_activo\"",
+                "f.FIN_NOMBRE      AS \"fin_nombre\"",
+                `(SELECT COUNT(*) FROM AGRO_SURCO sur JOIN AGRO_ARBOL arb ON sur.SUR_SURCO = arb.SUR_SURCOS WHERE sur.SECC_SECCIONES = s.SECC_SECCION AND sur.SUR_ACTIVO = 1 AND arb.ARB_ACTIVO = 1) AS "tiene_arboles"`
+            ])
+            .where("s.secc_activo = :activo", { activo: 1 });
 
-        // Permite filtrar para ver solo las secciones de una finca específica
         if (fincaId) {
-            where.fin_finca = Number(fincaId);
+            query.andWhere("s.fin_finca = :fincaId", { fincaId: Number(fincaId) });
         }
 
-        const secciones = await agroSeccionRepo.find({
-            where,
-            order: { secc_seccion: "ASC" }
-        });
+        const secciones = await query.orderBy("s.secc_seccion", "ASC").getRawMany();
 
         res.json({ ok: true, secciones });
     } catch (error) {
+        console.error("ERROR EN GET SECCIONES:", error);
         res.status(500).json({ ok: false, message: "Error al obtener las secciones", error });
     }
 };
@@ -41,12 +49,19 @@ export const getAgroSeccionById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const seccion = await agroSeccionRepo.findOne({
-            where: { 
-                secc_seccion: Number(id),
-                secc_activo: 1 
-            }
-        });
+        const seccion = await agroSeccionRepo.createQueryBuilder("s")
+            .leftJoin("AGRO_FINCA", "f", "s.fin_finca = f.FIN_FINCA")
+            .select([
+                "s.secc_seccion    AS \"secc_seccion\"",
+                "s.secc_nombre     AS \"secc_nombre\"",
+                "s.secc_tipo_suelo  AS \"secc_tipo_suelo\"",
+                "s.fin_finca       AS \"fin_finca\"",
+                "s.secc_activo     AS \"secc_activo\"",
+                "f.FIN_NOMBRE      AS \"fin_nombre\""
+            ])
+            .where("s.secc_seccion = :id", { id: Number(id) })
+            .andWhere("s.secc_activo = :activo", { activo: 1 })
+            .getRawOne();
 
         if (!seccion) {
             return res.status(404).json({ ok: false, message: `Sección con ID ${id} no encontrada o inactiva` });
@@ -54,6 +69,7 @@ export const getAgroSeccionById = async (req: Request, res: Response) => {
 
         res.json({ ok: true, seccion });
     } catch (error) {
+        console.error("ERROR EN GET SECCION BY ID:", error);
         res.status(500).json({ ok: false, message: "Error al obtener la sección", error });
     }
 };
