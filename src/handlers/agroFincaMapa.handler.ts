@@ -81,6 +81,37 @@ export const getMapaFincaCompleto = async (req: Request, res: Response) => {
             };
         });
 
+        // 5. Estadísticas de salud por sección (Semaforización)
+        const seccionesStats = await AppDataSource.query(`
+            SELECT 
+                SEC.SECC_SECCION AS "seccion_id",
+                SEC.SECC_NOMBRE AS "nombre",
+                COUNT(A.ARB_ARBOL) AS "total",
+                COALESCE(SUM(CASE WHEN A.ARB_ESTADO = 'Enfermo' THEN 1 ELSE 0 END), 0) AS "enfermos",
+                ROUND(
+                    CASE 
+                        WHEN COUNT(A.ARB_ARBOL) > 0 
+                        THEN (COALESCE(SUM(CASE WHEN A.ARB_ESTADO = 'Enfermo' THEN 1 ELSE 0 END), 0) * 100.0 / COUNT(A.ARB_ARBOL))
+                        ELSE 0 
+                    END, 2
+                ) AS "incidencia"
+            FROM AGRO_SECCION SEC
+            LEFT JOIN AGRO_SURCO S ON SEC.SECC_SECCION = S.SECC_SECCIONES AND S.SUR_ACTIVO = 1
+            LEFT JOIN AGRO_ARBOL A ON S.SUR_SURCO = A.SUR_SURCOS AND A.ARB_ACTIVO = 1
+            WHERE SEC.FIN_FINCA = :fincaId
+              AND SEC.SECC_ACTIVO = 1
+            GROUP BY SEC.SECC_SECCION, SEC.SECC_NOMBRE
+        `, [fincaId]);
+
+        // Convertir strings de Oracle a números para evitar problemas en el frontend
+        const statsFormateadas = seccionesStats.map((s: any) => ({
+            seccion_id: Number(s.seccion_id),
+            nombre: s.nombre,
+            total: Number(s.total),
+            enfermos: Number(s.enfermos),
+            incidencia: Number(s.incidencia)
+        }));
+
         res.json({
             ok: true,
             finca,
@@ -91,6 +122,7 @@ export const getMapaFincaCompleto = async (req: Request, res: Response) => {
                 seccion_id: p.secc_seccion,
             })),
             arboles,
+            secciones_stats: statsFormateadas
         });
 
     } catch (error) {
