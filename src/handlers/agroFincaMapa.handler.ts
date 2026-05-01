@@ -45,7 +45,8 @@ export const getMapaFincaCompleto = async (req: Request, res: Response) => {
                 S.SUR_ESPACIAMIENTO  AS "espaciamiento",
                 SEC.SECC_NOMBRE      AS "seccion_nombre",
                 SEC.SECC_SECCION     AS "seccion_id",
-                T.TIPAR_NOMBRE_COMUN AS "variedad"
+                T.TIPAR_NOMBRE_COMUN AS "variedad",
+                T.TIPAR_ANIOS_PRODUCCION AS "anios_produccion"
             FROM AGRO_ARBOL A
             JOIN AGRO_SURCO   S   ON A.SUR_SURCOS        = S.SUR_SURCO
             JOIN AGRO_SECCION SEC ON S.SECC_SECCIONES     = SEC.SECC_SECCION
@@ -64,8 +65,20 @@ export const getMapaFincaCompleto = async (req: Request, res: Response) => {
         const latOrigen = finca.fin_latitud_origen;
         const lngOrigen = finca.fin_longitud_origen;
 
+        const ahora = new Date();
+
         const arboles = arbolesRaw.map((a: any) => {
             const esp = Number(a.espaciamiento) || 2; // fallback 2m si no tiene espaciamiento
+
+            // Calcular si el árbol es "sospechoso":
+            // Un árbol en Crecimiento que ya superó sus años esperados de producción
+            let estado_sospechoso = false;
+            if (a.estado === "Crecimiento" && a.fecha_siembra && a.anios_produccion) {
+                const siembra = new Date(a.fecha_siembra);
+                const aniosTranscurridos = (ahora.getTime() - siembra.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+                estado_sospechoso = aniosTranscurridos > Number(a.anios_produccion);
+            }
+
             return {
                 id: a.id,
                 estado: a.estado,
@@ -78,8 +91,40 @@ export const getMapaFincaCompleto = async (req: Request, res: Response) => {
                 referencia: `S${a.numero_surco}-P${a.posicion_surco}`,
                 lat: latOrigen + (Number(a.posicion_surco) * esp * METROS_POR_GRADO),
                 lng: lngOrigen + (Number(a.numero_surco) * esp * METROS_POR_GRADO),
+                estado_sospechoso,
             };
         });
+
+        // 5. Estadísticas de salud por sección (Semaforización)
+        const seccionesStats = await AppDataSource.query(`
+            SELECT 
+                SEC.SECC_SECCION AS "seccion_id",
+                SEC.SECC_NOMBRE AS "nombre",
+                COUNT(A.ARB_ARBOL) AS "total",
+                COALESCE(SUM(CASE WHEN A.ARB_ESTADO = 'Enfermo' THEN 1 ELSE 0 END), 0) AS "enfermos",
+                ROUND(
+                    CASE 
+                        WHEN COUNT(A.ARB_ARBOL) > 0 
+                        THEN (COALESCE(SUM(CASE WHEN A.ARB_ESTADO = 'Enfermo' THEN 1 ELSE 0 END), 0) * 100.0 / COUNT(A.ARB_ARBOL))
+                        ELSE 0 
+                    END, 2
+                ) AS "incidencia"
+            FROM AGRO_SECCION SEC
+            LEFT JOIN AGRO_SURCO S ON SEC.SECC_SECCION = S.SECC_SECCIONES AND S.SUR_ACTIVO = 1
+            LEFT JOIN AGRO_ARBOL A ON S.SUR_SURCO = A.SUR_SURCOS AND A.ARB_ACTIVO = 1
+            WHERE SEC.FIN_FINCA = :fincaId
+              AND SEC.SECC_ACTIVO = 1
+            GROUP BY SEC.SECC_SECCION, SEC.SECC_NOMBRE
+        `, [fincaId]);
+
+        // Convertir strings de Oracle a números para evitar problemas en el frontend
+        const statsFormateadas = seccionesStats.map((s: any) => ({
+            seccion_id: Number(s.seccion_id),
+            nombre: s.nombre,
+            total: Number(s.total),
+            enfermos: Number(s.enfermos),
+            incidencia: Number(s.incidencia)
+        }));
 
         res.json({
             ok: true,
@@ -91,6 +136,7 @@ export const getMapaFincaCompleto = async (req: Request, res: Response) => {
                 seccion_id: p.secc_seccion,
             })),
             arboles,
+            secciones_stats: statsFormateadas
         });
 
     } catch (error) {
