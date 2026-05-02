@@ -8,7 +8,15 @@ const app = express()
 
 //Cors
 app.use(cors({
-    origin: process.env.FRONTEND_SERVICE  // puerto de Vite
+    origin: (origin, callback) => {
+        // Permitir cualquier puerto de localhost en desarrollo
+        if (!origin || /^http:\/\/localhost(:\d+)?$/.test(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
 }));
 
 
