@@ -13,17 +13,25 @@ export const getAgroClimas = async (req: Request, res: Response) => {
     try {
         const { seccionId } = req.query;
 
-        const where: any = {};
+        // Hacemos JOIN con AGRO_SECCION para obtener el nombre de la sección
+        let query = agroClimaRepo.createQueryBuilder("c")
+            .leftJoin("AGRO_SECCION", "s", "c.secc_seccion = s.SECC_SECCION")
+            .select([
+                "c.clim_clima           AS \"clim_clima\"",
+                "c.clim_fecha           AS \"clim_fecha\"",
+                "c.clim_temperatura     AS \"clim_temperatura\"",
+                "c.clim_humedad_relativa AS \"clim_humedad_relativa\"",
+                "c.clim_precipitacion   AS \"clim_precipitacion\"",
+                "c.secc_seccion         AS \"secc_seccion\"",
+                "s.SECC_NOMBRE          AS \"secc_nombre\"",
+            ])
+            .orderBy("c.clim_fecha", "DESC");
 
-        // Ahora filtramos directamente por la columna numérica
         if (seccionId) {
-            where.secc_seccion = Number(seccionId);
+            query = query.where("c.secc_seccion = :seccionId", { seccionId: Number(seccionId) });
         }
 
-        const climas = await agroClimaRepo.find({
-            where,
-            order: { clim_fecha: "DESC" } 
-        });
+        const climas = await query.getRawMany();
 
         res.json({ ok: true, climas });
 
