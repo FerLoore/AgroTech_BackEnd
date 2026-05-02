@@ -8,9 +8,16 @@ const alertaRepo = AppDataSource.getRepository(AgroAlertaSalud);
 export const getAlertas = async (req: Request, res: Response) => {
   try {
     const alertas = await alertaRepo.find({
-      where: { alertsalud_activo: 1 }
+      where: { alertsalud_activo: 1 },
+      relations: [
+        "arbol", 
+        "arbol.surco", 
+        "arbol.surco.seccion", 
+        "arbol.surco.seccion.finca"
+      ]
     });
     res.json(alertas);
+
   } catch (error) {
     res.status(500).json({ message: "Error obteniendo alertas" });
   }

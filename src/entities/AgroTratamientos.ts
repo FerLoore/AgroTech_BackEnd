@@ -1,4 +1,8 @@
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import { AgroSeccion } from "./AgroSeccion";
+import { AgroAlertaSalud } from "./AgroAlertaSalud";
+
+
 
 @Entity({ name: "AGRO_TRATAMIENTOS" })
 export class AgroTratamientos {
@@ -27,8 +31,18 @@ export class AgroTratamientos {
   @Column({ name: "ALERTSALU_ALERTA_SALUD", nullable: true })
   alertsalu_alerta_salud: number;
 
+  @ManyToOne(() => AgroAlertaSalud)
+  @JoinColumn({ name: "ALERTSALU_ALERTA_SALUD" })
+  alerta: AgroAlertaSalud;
+
+
   @Column({ name: "SECC_SECCION", nullable: true })
   secc_seccion: number;
+
+  @ManyToOne(() => AgroSeccion)
+  @JoinColumn({ name: "SECC_SECCION" })
+  seccion: AgroSeccion;
+
 
   @Column({ name: "PRODU_PRODUCTO" })
   produ_producto: number;

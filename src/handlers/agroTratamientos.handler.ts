@@ -12,8 +12,20 @@ const tratamientosRepo = AppDataSource.getRepository(AgroTratamientos);
 // GET todos
 export const getTratamientos = async (req: Request, res: Response) => {
   try {
-    const tratamientos = await tratamientosRepo.find();
+    const tratamientos = await tratamientosRepo.find({
+      relations: [
+        "seccion", 
+        "seccion.finca", 
+        "alerta", 
+        "alerta.arbol", 
+        "alerta.arbol.surco", 
+        "alerta.arbol.surco.seccion", 
+        "alerta.arbol.surco.seccion.finca"
+      ]
+    });
+
     res.json(tratamientos);
+
   } catch (error) {
     console.error("Error obteniendo tratamientos:", error);
     res.status(500).json({ message: "Error obteniendo tratamientos" });

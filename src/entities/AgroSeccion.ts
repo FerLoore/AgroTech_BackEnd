@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import { AgroFinca } from "./AgroFinca";
+
 
 @Entity("AGRO_SECCION")
 export class AgroSeccion {
@@ -11,6 +13,11 @@ export class AgroSeccion {
 
     @Column({ name: "FIN_FINCA", type: "number", nullable: true })
     fin_finca: number;
+
+    @ManyToOne(() => AgroFinca)
+    @JoinColumn({ name: "FIN_FINCA" })
+    finca: AgroFinca;
+
 
    @Column({ name: "SECC_TIPO_SUELO", type: "varchar2", length: 80})
     secc_tipo_suelo: string;

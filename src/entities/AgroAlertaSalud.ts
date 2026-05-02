@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import { AgroArbol } from "./AgroArbol";
+
 
 @Entity("AGRO_ALERTA_SALUD")
 export class AgroAlertaSalud {
@@ -17,6 +19,11 @@ export class AgroAlertaSalud {
 
   @Column({ name: "ARB_ARBOL", type: "number" })
   arb_arbol: number;
+
+  @ManyToOne(() => AgroArbol)
+  @JoinColumn({ name: "ARB_ARBOL" })
+  arbol: AgroArbol;
+
 
   @Column({ name: "USU_USUARIO", type: "number" })
   usu_usuario: number;

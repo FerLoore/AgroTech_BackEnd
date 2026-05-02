@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
+import { AgroSurco } from "./AgroSurco";
+
 
 @Entity("AGRO_ARBOL")
 export class AgroArbol {
@@ -20,6 +22,11 @@ export class AgroArbol {
 
     @Column({ name: "SUR_SURCOS", type: "number" })
     sur_surcos: number;
+
+    @ManyToOne(() => AgroSurco)
+    @JoinColumn({ name: "SUR_SURCOS" })
+    surco: AgroSurco;
+
 
     @Column({ name: "ARB_ACTIVO", type: "number", default: 1 })
     arb_activo: number;
