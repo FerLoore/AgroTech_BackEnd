@@ -16,6 +16,7 @@ import agroSeccionRoutes from "./routes/agroSeccion.routes";
 import agroAuditoriaRoutes from "./routes/agroAuditoria.routes";
 import agroFincaMapaRoutes from "./routes/agroFincaMapa.routes";
 import agroFincaPerimetroRoutes from "./routes/agroFincaPerimetro.routes";
+import agroReportesRoutes from "./routes/agroReportes.routes";
 
 // Cada dev agrega su línea aquí al terminar su módulo
 // Dev 1 → agroRol, agroTipoArbol, agroCatalogoPatogeno, agroProducto
@@ -53,4 +54,5 @@ router.use("/agro-surcos", agroSurcoRoutes);
 router.use("/agro-arboles", agroArbolRoutes);
 router.use("/agro-historial", agroHistorialRoutes);
 router.use("/agro-auditoria", agroAuditoriaRoutes);
+router.use("/agro-reportes", agroReportesRoutes);
 export default router;
