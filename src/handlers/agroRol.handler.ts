@@ -48,17 +48,18 @@ export const getAgroRolById = async (req: Request, res: Response) => {
 
 // ─────────────────────────────────────────────────────────────
 // POST /api/agro-roles
-// Body: { rol_rol, rol_nombre, rol_descripcion, rol_permiso }
+// Body: { rol_nombre, rol_descripcion, rol_permiso }
+// Nota: rol_rol se genera automáticamente con MAX(rol_rol)+1
 // ─────────────────────────────────────────────────────────────
 export const createAgroRol = async (req: Request, res: Response) => {
     try {
-        const { rol_rol, rol_nombre, rol_descripcion, rol_permiso } = req.body;
+        const { rol_nombre, rol_descripcion, rol_permiso } = req.body;
 
-        // Validar campos requeridos
-        if (!rol_rol || !rol_nombre || !rol_permiso) {
+        // Validar campos requeridos (rol_rol lo genera el backend)
+        if (!rol_nombre || !rol_permiso) {
             return res.status(400).json({
                 ok: false,
-                message: "Campos requeridos: rol_rol, rol_nombre, rol_permiso"
+                message: "Campos requeridos: rol_nombre, rol_permiso"
             });
         }
 
@@ -70,20 +71,16 @@ export const createAgroRol = async (req: Request, res: Response) => {
             });
         }
 
-        // Verificar ID duplicado
-        const existe = await agroRolRepo.findOne({
-            where: { rol_rol: Number(rol_rol) }
-        });
+        // Calcular el próximo ID con MAX(rol_rol) + 1
+        const result = await agroRolRepo
+            .createQueryBuilder("r")
+            .select("MAX(r.rol_rol)", "maxId")
+            .getRawOne();
 
-        if (existe) {
-            return res.status(409).json({
-                ok: false,
-                message: `Ya existe un rol con ID ${rol_rol}`
-            });
-        }
+        const nextId = (Number(result?.maxId) || 0) + 1;
 
         const nuevoRol = agroRolRepo.create({
-            rol_rol:        Number(rol_rol),
+            rol_rol:        nextId,
             rol_nombre,
             rol_descripcion,
             rol_permiso:    Number(rol_permiso),
