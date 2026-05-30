@@ -83,6 +83,13 @@ export const createAgroFinca = async (req: Request, res: Response) => {
             });
         }
 
+        if (fin_hectarea !== undefined && fin_hectarea !== null && fin_hectarea !== "" && Number(fin_hectarea) <= 0) {
+            return res.status(400).json({
+                ok: false,
+                message: "Las hectáreas deben ser mayores a 0"
+            });
+        }
+
         const nuevaFinca = agroFincaRepo.create({
             fin_nombre,
             fin_ubicacion: fin_ubicacion || null,
@@ -113,6 +120,13 @@ export const updateAgroFinca = async (req: Request, res: Response) => {
 
         if (!finca) {
             return res.status(404).json({ ok: false, message: `Finca con ID ${id} no encontrada` });
+        }
+
+        if (fin_hectarea !== undefined && fin_hectarea !== null && fin_hectarea !== "" && Number(fin_hectarea) <= 0) {
+            return res.status(400).json({
+                ok: false,
+                message: "Las hectáreas deben ser mayores a 0"
+            });
         }
 
         if (fin_nombre !== undefined) finca.fin_nombre = fin_nombre;
