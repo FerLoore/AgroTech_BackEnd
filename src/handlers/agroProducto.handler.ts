@@ -79,6 +79,13 @@ export const createAgroProducto = async (req: Request, res: Response) => {
             });
         }
 
+        if (produ_stock_minimo !== undefined && Number(produ_stock_minimo) <= 0) {
+            return res.status(400).json({
+                ok: false,
+                message: "El stock mínimo debe ser mayor a 0"
+            });
+        }
+
         // Verificar nombre duplicado
         const existe = await agroProductoRepo.findOne({
             where: { produ_nombre }
@@ -138,6 +145,13 @@ export const updateAgroProducto = async (req: Request, res: Response) => {
             return res.status(404).json({
                 ok: false,
                 message: `Producto con ID ${id} no encontrado`
+            });
+        }
+
+        if (produ_stock_minimo !== undefined && Number(produ_stock_minimo) <= 0) {
+            return res.status(400).json({
+                ok: false,
+                message: "El stock mínimo debe ser mayor a 0"
             });
         }
 
