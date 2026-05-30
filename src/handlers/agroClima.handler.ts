@@ -85,6 +85,16 @@ export const createAgroClima = async (req: Request, res: Response) => {
             });
         }
 
+        if (clim_temperatura !== undefined && clim_temperatura !== null && clim_temperatura !== "" && Number(clim_temperatura) === 0) {
+            return res.status(400).json({ ok: false, message: "La temperatura no puede ser 0" });
+        }
+        if (clim_humedad_relativa !== undefined && clim_humedad_relativa !== null && clim_humedad_relativa !== "" && Number(clim_humedad_relativa) === 0) {
+            return res.status(400).json({ ok: false, message: "La humedad relativa no puede ser 0" });
+        }
+        if (clim_precipitacion !== undefined && clim_precipitacion !== null && clim_precipitacion !== "" && Number(clim_precipitacion) === 0) {
+            return res.status(400).json({ ok: false, message: "La precipitación no puede ser 0" });
+        }
+
         // Creamos la instancia asignando el número directamente a secc_seccion
         const nuevoClima = agroClimaRepo.create({
             clim_temperatura: clim_temperatura !== undefined ? Number(clim_temperatura) : null,
@@ -129,6 +139,16 @@ export const updateAgroClima = async (req: Request, res: Response) => {
                 ok: false,
                 message: `Registro climático con ID ${id} no encontrado`
             });
+        }
+
+        if (clim_temperatura !== undefined && clim_temperatura !== null && clim_temperatura !== "" && Number(clim_temperatura) === 0) {
+            return res.status(400).json({ ok: false, message: "La temperatura no puede ser 0" });
+        }
+        if (clim_humedad_relativa !== undefined && clim_humedad_relativa !== null && clim_humedad_relativa !== "" && Number(clim_humedad_relativa) === 0) {
+            return res.status(400).json({ ok: false, message: "La humedad relativa no puede ser 0" });
+        }
+        if (clim_precipitacion !== undefined && clim_precipitacion !== null && clim_precipitacion !== "" && Number(clim_precipitacion) === 0) {
+            return res.status(400).json({ ok: false, message: "La precipitación no puede ser 0" });
         }
 
         // Actualiza solo los campos que vienen en el body
